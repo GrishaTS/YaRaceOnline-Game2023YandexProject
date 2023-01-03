@@ -1,1 +1,1 @@
-"# YaRaceOnlineGame2023YandexProject" 
+# YaRaceOnlineGame2023YandexProject
