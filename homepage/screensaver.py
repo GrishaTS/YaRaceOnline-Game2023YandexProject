@@ -1,9 +1,9 @@
 import pygame
 
 from core.buttons import Button
-from core.constants import HEIGHT, WIDTH
 from core.load_file import load_image
 from core.screen_operation import terminate
+from settings import HEIGHT, WIDTH
 
 IMAGES = {
     'screensaver': load_image('screensaver/screensaver.jpg'),
