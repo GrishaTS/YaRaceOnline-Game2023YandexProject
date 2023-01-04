@@ -4,7 +4,6 @@ from core.buttons import Button
 from core.load_file import load_image
 from core.screen_operation import terminate
 # from homepage.change_options import settings
-# from homepage.change_car import choice_menu
 from settings import HEIGHT, WIDTH
 
 IMAGES = {
@@ -15,16 +14,12 @@ IMAGES = {
 class Manager:
     btn_func = {
         # 'button_settings': settings,
-        # 'button_car': choice_menu,
     }
 
     def __init__(self, screen, user):
         self.user = user
         self.screen = screen
         self.button_settings = Button(1200, 20, 'screensaver/settings.png')
-
-    def settings(self):
-        ...
 
     def start_screen(self):
         fon = pygame.transform.scale(IMAGES['screensaver'], (WIDTH, HEIGHT))
