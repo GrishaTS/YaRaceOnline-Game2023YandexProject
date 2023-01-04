@@ -1,5 +1,6 @@
 import pygame
 
+from core.screen_operation import terminate
 from settings import HEIGHT, WIDTH
 
 
@@ -19,25 +20,50 @@ def draw_buttons_for_settings(screen, font, text_y, parent_text):
         )
 
 
-def draw_settings(screen):
-    screen.fill((0, 0, 0))
-    font = pygame.font.Font(None, 50)
+class Settings:
+    def __init__(self, screen, user):
+        self.user = user
+        self.screen = screen
 
-    title_text = font.render('Настройки', True, (220, 20, 60))
-    title_x = WIDTH // 2 - title_text.get_width() // 2
-    title_y = HEIGHT // 10 - title_text.get_height() // 10
-    screen.blit(title_text, (title_x, title_y))
+    def start_screen(self, screen):
+        screen.fill((0, 0, 0))
+        font = pygame.font.Font(None, 50)
 
-    music_text = font.render('Музыка', True, (220, 20, 60))
-    music_x = 10
-    music_y = HEIGHT // 2.5 - music_text.get_height() // 2
-    screen.blit(music_text, (music_x, music_y))
+        title_text = font.render('Настройки', True, (220, 20, 60))
+        title_x = WIDTH // 2 - title_text.get_width() // 2
+        title_y = HEIGHT // 10 - title_text.get_height() // 10
+        screen.blit(title_text, (title_x, title_y))
 
-    draw_buttons_for_settings(screen, font, HEIGHT // 2.5, music_text)
+        music_text = font.render('Музыка', True, (220, 20, 60))
+        music_x = 10
+        music_y = HEIGHT // 2.5 - music_text.get_height() // 2
+        screen.blit(music_text, (music_x, music_y))
 
-    sound_text = font.render('Звуки', True, (220, 20, 60))
-    sound_x = 15
-    sound_y = HEIGHT // 1.5 - sound_text.get_height() // 2
-    screen.blit(sound_text, (sound_x, sound_y))
+        draw_buttons_for_settings(screen, font, HEIGHT // 2.5, music_text)
 
-    draw_buttons_for_settings(screen, font, HEIGHT // 1.5, music_text)
+        sound_text = font.render('Звуки', True, (220, 20, 60))
+        sound_x = 15
+        sound_y = HEIGHT // 1.5 - sound_text.get_height() // 2
+        screen.blit(sound_text, (sound_x, sound_y))
+
+        draw_buttons_for_settings(screen, font, HEIGHT // 1.5, music_text)
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    terminate()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    self.push_button(event)
+            pygame.display.flip()
+
+    def push_button(self, event):
+        for button in self.__dict__:
+            if button.startswith('button'):
+                if self.__dict__[button].is_button_down(event.pos):
+                    print('grisha loh')
+
+
+def settings():
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    screensaver = Settings(screen, 123)
+    screensaver.start_screen()
