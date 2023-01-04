@@ -66,4 +66,4 @@ class Settings:
 def settings():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     screensaver = Settings(screen, 123)
-    screensaver.start_screen()
+    screensaver.start_screen(screen)
