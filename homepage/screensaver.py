@@ -4,6 +4,7 @@ from core.buttons import Button
 from core.load_file import load_image
 from core.screen_operation import terminate
 # from homepage.change_options import settings
+# from homepage.change_car import choice_menu
 from settings import HEIGHT, WIDTH
 
 IMAGES = {
@@ -14,6 +15,7 @@ IMAGES = {
 class Manager:
     btn_func = {
         # 'button_settings': settings,
+        # 'button_car': choice_menu,
     }
 
     def __init__(self, screen, user):
@@ -51,7 +53,7 @@ class Manager:
 
 
 def homepage():
-    pygame.init()  # условно
+    pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     screensaver = Manager(screen, 123)
     screensaver.start_screen()
