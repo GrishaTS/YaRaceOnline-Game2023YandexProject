@@ -3,6 +3,8 @@ import pygame
 from core.buttons import Button
 from core.load_file import load_image
 from core.screen_operation import terminate
+from homepage.change_car import choosing_car
+from homepage.change_options import settings
 from settings import HEIGHT, WIDTH
 
 IMAGES = {
@@ -10,14 +12,17 @@ IMAGES = {
 }
 
 
-class Screensaver:
+class Manager:
+    btn_func = {
+        'button_settings': settings,
+        'button_garage': choosing_car,
+    }
+
     def __init__(self, screen, user):
         self.user = user
         self.screen = screen
         self.button_settings = Button(1200, 20, 'screensaver/settings.png')
-
-    def settings(self):
-        ...
+        self.button_garage = Button(20, 80, 'screensaver/garage.png')
 
     def start_screen(self):
         fon = pygame.transform.scale(IMAGES['screensaver'], (WIDTH, HEIGHT))
@@ -42,14 +47,11 @@ class Screensaver:
         for button in self.__dict__:
             if button.startswith('button'):
                 if self.__dict__[button].is_button_down(event.pos):
-                    print(button)
+                    self.btn_func[button]()
 
 
-def main():
-    pygame.init()  # условно
+def homepage():
+    pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    screensaver = Screensaver(screen, 123)
+    screensaver = Manager(screen, 123)
     screensaver.start_screen()
-
-
-main()

@@ -1,13 +1,4 @@
-import pygame
-
-from homepage.change_options import draw_settings
-from settings import SIZE
+from homepage.screensaver import homepage
 
 if __name__ == '__main__':
-    pygame.init()
-    screen = pygame.display.set_mode(SIZE)
-    draw_settings(screen)
-    pygame.display.flip()
-    while pygame.event.wait().type != pygame.QUIT:
-        pass
-    pygame.quit()
+    homepage()
