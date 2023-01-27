@@ -25,28 +25,28 @@ class Settings:
         self.user = user
         self.screen = screen
 
-    def start_screen(self, screen):
-        screen.fill((0, 0, 0))
+    def start_screen(self):
+        self.screen.fill((0, 0, 0))
         font = pygame.font.Font(None, 50)
 
         title_text = font.render('Настройки', True, (220, 20, 60))
         title_x = WIDTH // 2 - title_text.get_width() // 2
         title_y = HEIGHT // 10 - title_text.get_height() // 10
-        screen.blit(title_text, (title_x, title_y))
+        self.screen.blit(title_text, (title_x, title_y))
 
         music_text = font.render('Музыка', True, (220, 20, 60))
         music_x = 10
         music_y = HEIGHT // 2.5 - music_text.get_height() // 2
-        screen.blit(music_text, (music_x, music_y))
+        self.screen.blit(music_text, (music_x, music_y))
 
-        draw_buttons_for_settings(screen, font, HEIGHT // 2.5, music_text)
+        draw_buttons_for_settings(self.screen, font, HEIGHT // 2.5, music_text)
 
         sound_text = font.render('Звуки', True, (220, 20, 60))
         sound_x = 15
         sound_y = HEIGHT // 1.5 - sound_text.get_height() // 2
-        screen.blit(sound_text, (sound_x, sound_y))
+        self.screen.blit(sound_text, (sound_x, sound_y))
 
-        draw_buttons_for_settings(screen, font, HEIGHT // 1.5, music_text)
+        draw_buttons_for_settings(self.screen, font, HEIGHT // 1.5, music_text)
 
         while True:
             for event in pygame.event.get():
@@ -66,4 +66,4 @@ class Settings:
 def settings():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     screensaver = Settings(screen, 123)
-    screensaver.start_screen(screen)
+    screensaver.start_screen()

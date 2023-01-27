@@ -1,32 +1,24 @@
 import pygame
 
 from core.buttons import Button
-from core.load_file import load_image
 from core.screen_operation import terminate
-from homepage.change_car import choosing_car
-from homepage.change_options import settings
 from settings import HEIGHT, WIDTH
 
-IMAGES = {
-    'screensaver': load_image('screensaver/screensaver.jpg'),
-}
 
-
-class Manager:
-    btn_func = {
-        'button_settings': settings,
-        'button_garage': choosing_car,
-    }
+class Garage:
 
     def __init__(self, screen, user):
         self.user = user
         self.screen = screen
-        self.button_settings = Button(1200, 20, 'screensaver/settings.png')
-        self.button_garage = Button(20, 80, 'screensaver/garage.png')
+        self.button_car1 = Button(57, 150, 'garage/side_view/1.png')
+        self.button_car2 = Button(465, 150, 'garage/side_view/2.png')
+        self.button_car3 = Button(873, 150, 'garage/side_view/3.png')
+        self.button_car4 = Button(57, 450, 'garage/side_view/4.png')
+        self.button_car5 = Button(465, 450, 'garage/side_view/5.png')
+        self.button_car6 = Button(873, 450, 'garage/side_view/6.png')
 
     def start_screen(self):
-        fon = pygame.transform.scale(IMAGES['screensaver'], (WIDTH, HEIGHT))
-        self.screen.blit(fon, (0, 0))
+        self.screen.fill('grey')
         for button in self.__dict__:
             if button.startswith('button'):
                 btn = self.__dict__[button]
@@ -47,11 +39,13 @@ class Manager:
         for button in self.__dict__:
             if button.startswith('button'):
                 if self.__dict__[button].is_button_down(event.pos):
-                    self.btn_func[button]()
+                    self.choice_car(button[-1])
+
+    def choice_car(self, id):
+        print(id)
 
 
-def homepage():
-    pygame.init()
+def choosing_car():
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    screensaver = Manager(screen, 123)
-    screensaver.start_screen()
+    garage = Garage(screen, 123)
+    garage.start_screen()
