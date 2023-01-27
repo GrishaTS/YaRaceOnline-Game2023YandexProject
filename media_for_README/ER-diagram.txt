@@ -1,0 +1,30 @@
+user
+--
+ID int pk
+name varchar
+money int
+music int
+sounds int
+active_car bigint fk
+active_road bigint fk
+record time
+
+garage
+--
+ID int pk
+model varchar
+photo varchar
+price int
+speed int
+
+
+user_garage
+--
+ID int pk
+user_id bigint FK >- user.ID
+garage_id bigint FK >- garage.ID
+
+road
+--
+ID int pk
+photos varchar
