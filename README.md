@@ -46,3 +46,8 @@ python main.py
 ```
 
 ***
+
+## ER-diagram
+![Image of the ER-diagram](https://github.com/GrishaTS/YaRaceOnline-Game2023YandexProject/raw/main/media_for_README/ER-diagram.png)
+
+***
