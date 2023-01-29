@@ -1,15 +1,17 @@
 import sqlite3
 
 from PyQt5.QtWidgets import QLineEdit, QMainWindow, QMessageBox
-
+# from homepage.screensaver import homepage
 from settings import DATABASE
 
-from ..account.account_widget import AccountWidget
-from ..core.exceptions import ValidationError
-from .models import users_model
-from .templates.sign_up_template import Ui_SigningUp
-from .validators import (validate_agreement, validate_email, validate_login,
-                         validate_password)
+from core.exceptions import ValidationError
+from users.sign_up.models import users_model
+from users.sign_up.templates.sign_up_template import Ui_SigningUp
+from users.sign_up.validators import (
+                                      validate_agreement,
+                                      validate_login,
+                                     )
+from core.validators import validate_password
 
 
 class SignUpWidget(QMainWindow, Ui_SigningUp):
@@ -26,21 +28,14 @@ class SignUpWidget(QMainWindow, Ui_SigningUp):
 
     def registrate_user(self):
         con = sqlite3.connect(DATABASE)
-
         login = self.login_sign_up_edit.text()
         password1 = self.password_sign_up_edit.text()
         password2 = self.password2_sign_up_edit.text()
-        email = self.email_sign_up_edit.text()
         agreement = self.confirm_personal_data_checkbox.isChecked()
 
         login = self.validate_show_message(
             login,
             validate_func=validate_login,
-            con=con,
-        )
-        email = self.validate_show_message(
-            email,
-            validate_func=validate_email,
             con=con,
         )
         password = self.validate_show_message(
@@ -52,18 +47,16 @@ class SignUpWidget(QMainWindow, Ui_SigningUp):
             agreement,
             validate_func=validate_agreement,
         )
-        if any(x is None for x in (login, email, password, agreement)):
+        if any(x is None for x in (login, password, agreement)):
             return
 
         users_model.insert_new_user(
             login=login,
             password=password,
-            email=email
         )
         con.commit()
 
-        self.form = AccountWidget(login=login, email=email, image=None)
-        self.form.show()
+        # homepage()
         self.hide()
 
     def validate_show_message(self, *data, validate_func, con=None):
