@@ -58,15 +58,30 @@ class Garage:
                     )
                     self.screen.blit(btn_img, (btn.x, btn.y))
 
-
                     btn_unlocked = pygame.transform.scale(
                         load_image('garage/lock.png'),
                         (100, 100),
                     )
                     self.screen.blit(
                         btn_unlocked,
-                        (btn.x + btn.image_x / 2, btn.y + btn.image_y / 2 - 50),
+                        (
+                            btn.x + btn.image_x / 2,
+                            btn.y + btn.image_y / 2 - 50,
+                        ),
                     )
+
+                    money = __import__('random').randrange(1000, 5000)
+                    text_m = font.render(f'{money}$', True, '#54bd42')
+                    x = btn.x + car.image_x / 2
+                    y = btn.y + 100
+                    self.screen.blit(
+                        text_m,
+                        (
+                            btn.x + btn.image_x / 2,
+                            btn.y + btn.image_y / 2 + 20,
+                        ),
+                    )
+
             pygame.display.flip()
 
     def push_button(self, event):
