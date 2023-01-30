@@ -2,13 +2,13 @@ import sqlite3
 
 from PyQt5.QtWidgets import QLineEdit, QMainWindow, QMessageBox
 
-from settings import DATABASE
-
 from core.exceptions import ValidationError
+from core.validators import validate_password
+from homepage.screensaver import homepage
+from settings import DATABASE
 from users.recovery.models import users_model
 from users.recovery.templates.recovery_template import Ui_Recovery
 from users.recovery.validators import validate_login
-from core.validators import validate_password
 
 
 class RecoveryWidget(QMainWindow, Ui_Recovery):
@@ -45,8 +45,9 @@ class RecoveryWidget(QMainWindow, Ui_Recovery):
         users_model.update_password_of_the_user(login=login, password=password)
 
         data = users_model.select_all_user_data(login=login)
-        # homepage(login=data[0][1])
         self.hide()
+        print(data[0][1])
+        # homepage(data[0][1])
 
     def validate_show_message(self, *data, validate_func, con=None):
         try:
