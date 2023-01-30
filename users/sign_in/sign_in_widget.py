@@ -1,9 +1,10 @@
 from PyQt5.QtWidgets import QLineEdit, QMainWindow, QMessageBox
 
+from homepage.screensaver import homepage
+from users.models import User
 from users.recovery.recovery_widget import RecoveryWidget
-from users.sign_up.sign_up_widget import SignUpWidget
-from users.sign_in.models import users_model
 from users.sign_in.templates.sign_in_template import Ui_SigningIn
+from users.sign_up.sign_up_widget import SignUpWidget
 
 
 class SignInWidget(QMainWindow, Ui_SigningIn):
@@ -20,7 +21,8 @@ class SignInWidget(QMainWindow, Ui_SigningIn):
     def sign_in(self):
         login = self.login_sign_in_edit.text()
         password = self.password_sign_in_edit.text()
-        data = users_model.select_user(login=login)
+        user = User(login)
+        data = user.all_data
 
         if not data:
             QMessageBox.warning(
@@ -31,7 +33,7 @@ class SignInWidget(QMainWindow, Ui_SigningIn):
             )
             return
 
-        if data[0][-1] != password:
+        if data[4] != password:
             QMessageBox.warning(
                 self,
                 'Error',
@@ -40,8 +42,8 @@ class SignInWidget(QMainWindow, Ui_SigningIn):
             )
             return
 
-        assert len(data) <= 1, 'Some users have the same login'
-        # homepage(login=data[0][1])
+        user_data = ...
+        homepage(user_data)
         self.hide()
 
     def sign_up(self):

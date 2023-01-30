@@ -57,7 +57,7 @@ class Garage:
                         (btn.image_x, btn.image_y),
                     )
                     self.screen.blit(btn_img, (btn.x, btn.y))
-                    
+
                     btn_unlocked = pygame.transform.scale(
                         load_image('garage/lock.png'),
                         (100, 100),

@@ -1,17 +1,14 @@
 import sqlite3
 
 from PyQt5.QtWidgets import QLineEdit, QMainWindow, QMessageBox
-# from homepage.screensaver import homepage
-from settings import DATABASE
 
 from core.exceptions import ValidationError
-from users.sign_up.models import users_model
-from users.sign_up.templates.sign_up_template import Ui_SigningUp
-from users.sign_up.validators import (
-                                      validate_agreement,
-                                      validate_login,
-                                     )
 from core.validators import validate_password
+from homepage.screensaver import homepage
+from settings import DATABASE
+from users.models import users_model
+from users.sign_up.templates.sign_up_template import Ui_SigningUp
+from users.sign_up.validators import validate_agreement, validate_login
 
 
 class SignUpWidget(QMainWindow, Ui_SigningUp):
@@ -50,13 +47,13 @@ class SignUpWidget(QMainWindow, Ui_SigningUp):
         if any(x is None for x in (login, password, agreement)):
             return
 
-        users_model.insert_new_user(
+        users_model.insert_user(
             login=login,
             password=password,
         )
         con.commit()
-
-        # homepage()
+        user_data = ...
+        homepage(user_data)
         self.hide()
 
     def validate_show_message(self, *data, validate_func, con=None):
