@@ -27,18 +27,17 @@ class Car:
         self.velocity = velocity
         self.user = user
         self.locked = (car_id,) in list(sqlite3.connect('db.sqlite3').execute(
-            f'SELECT garage_id FROM user_garage WHERE user_id = {user_id}'  # user.id
+            f'SELECT garage_id FROM user_garage WHERE user_id = {user_id}'
         ))
-        print(self.locked)
 
     def buy(self):
         global user_coins
         user_coins -= self.price
         self.locked = True
-        print(f'INSERT INTO user_garage (user_id, garage_id) VALUES ({user_id}, {self.id});')
         db_connect = sqlite3.connect('db.sqlite3')
         db_connect.execute(
-            f'INSERT INTO user_garage (user_id, garage_id) VALUES ({user_id}, {self.id});'  # user.id
+            f'INSERT INTO user_garage (user_id, garage_id) VALUES ({user_id},'
+            f' {self.id});'  # user.id
         )
         db_connect.commit()
 
@@ -50,8 +49,8 @@ class Garage:
         for car in sqlite3.connect(
             'db.sqlite3'
         ).execute('SELECT * FROM garage'):
-            print(*car)
             self.__dict__[f'car{car[0]}'] = Car(*car, user_id)
+        self.button_home = Button(20, 20, 'garage/home.png')
 
     def start_screen(self):
         font_s = pygame.font.Font(None, 50)
@@ -71,6 +70,15 @@ class Garage:
             fon = pygame.transform.scale(IMAGES['backgroung'], (WIDTH, HEIGHT))
             self.screen.blit(fon, (0, 0))
             self.screen.blit(text_s, (x_selected, y_selected))
+
+            for button in self.__dict__:
+                if button.startswith('button'):
+                    btn = self.__dict__[button]
+                    btn_img = pygame.transform.scale(
+                        btn.image,
+                        (btn.image_x, btn.image_y),
+                    )
+                    self.screen.blit(btn_img, (btn.x, btn.y))
 
             text_c = font_s.render(f'{user_coins}$', True, '#54bd42')
             text_w_c = text_s.get_width()
@@ -136,10 +144,14 @@ class Garage:
             pygame.display.flip()
 
     def push_button(self, event, active_car):
-        for car in self.__dict__:
-            if car.startswith('car'):
-                if self.__dict__[car].btn.is_button_down(event.pos):
-                    return self.choice_car(self.__dict__[car], active_car)
+        from homepage.screensaver import homepage
+        for btn in self.__dict__:
+            if btn.startswith('car'):
+                if self.__dict__[btn].btn.is_button_down(event.pos):
+                    return self.choice_car(self.__dict__[btn], active_car)
+            elif btn.startswith('button'):
+                if self.__dict__[btn].is_button_down(event.pos):
+                    homepage()
         return active_car
 
     def choice_car(self, car, active_car):
