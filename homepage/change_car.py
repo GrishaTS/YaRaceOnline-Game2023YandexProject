@@ -14,6 +14,8 @@ IMAGES = {
                         (100, 100),
                     )
 }
+user_id = 4
+user_coins = 300
 
 
 class Car:

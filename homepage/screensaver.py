@@ -79,6 +79,7 @@ class Manager:
                     return button
 
 
+
 def homepage(user, music=True):
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
