@@ -71,13 +71,16 @@ class User:
             'or there are more than one user with such login'
         )
         assert len(user_data) == 1, error_message
-        user_data = user_data[0]
-        self.user_data = user_data
-        self.coins = user_data[0]
-        self.music = user_data[1]
-        self.sounds = user_data[2]
-        self.record = user_data[3]
-        self.password = user_data[4]
+        try:
+            user_data = user_data[0]
+            self.user_data = user_data
+            self.coins = user_data[0]
+            self.music = user_data[1]
+            self.sounds = user_data[2]
+            self.record = user_data[3]
+            self.password = user_data[4]
+        except LookupError:
+            self.user_data = user_data
 
     def __setitem__(self, key, value):
         self.__dict__[key] = value
