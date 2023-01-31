@@ -44,9 +44,8 @@ class RecoveryWidget(QMainWindow, Ui_Recovery):
             return
         user['password'] = password
         user = User(login)
-        data = user.all_data
-        homepage(data)
         self.hide()
+        homepage(user)
 
     def validate_show_message(self, *data, validate_func, con=None):
         try:
