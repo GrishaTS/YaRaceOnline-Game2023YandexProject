@@ -73,8 +73,8 @@ class Manager:
                     return button
 
 
-def homepage():
+def homepage(user):
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    screensaver = Manager(screen, 123)
+    screensaver = Manager(screen, user)
     screensaver.start_screen()

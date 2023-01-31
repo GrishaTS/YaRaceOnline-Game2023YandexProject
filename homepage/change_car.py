@@ -100,6 +100,18 @@ class Garage:
                         )
                     self.screen.blit(btn_img, (btn.x, btn.y))
 
+                    btn_unlocked = pygame.transform.scale(
+                        load_image('garage/lock.png'),
+                        (100, 100),
+                    )
+                    self.screen.blit(
+                        btn_unlocked,
+                        (
+                            btn.x + btn.image_x / 2,
+                            btn.y + btn.image_y / 2 - 50,
+                        ),
+                    )
+
             text_c = font_s.render(f'{user_coins}$', True, '#54bd42')
             text_w_c = text_s.get_width()
             text_h_c = text_s.get_height()
