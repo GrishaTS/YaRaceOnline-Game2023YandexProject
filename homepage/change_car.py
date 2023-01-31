@@ -183,7 +183,7 @@ class Garage:
                     return self.choice_car(self.__dict__[btn], active_car)
             elif btn.startswith('button'):
                 if self.__dict__[btn].is_button_down(event.pos):
-                    homepage()
+                    homepage(self.user)
         return active_car
 
     def pointing_button(self, event):
@@ -207,7 +207,7 @@ class Garage:
             return active_car
 
 
-def choosing_car():
+def choosing_car(user):
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    garage = Garage(screen, 123)
+    garage = Garage(screen, user)
     garage.start_screen()

@@ -16,7 +16,7 @@ class Manager:
     btn_func = {
         'button_settings': settings,
         'button_garage': choosing_car,
-        'button_road': lambda x: x,
+        # 'button_road': lambda x: x,
     }
 
     def __init__(self, screen, user):
@@ -64,7 +64,7 @@ class Manager:
         for button in self.__dict__:
             if button.startswith('button'):
                 if self.__dict__[button].is_button_down(event.pos):
-                    self.btn_func[button]()
+                    self.btn_func[button](self.user)
 
     def pointing_button(self, event):
         for button in self.__dict__:

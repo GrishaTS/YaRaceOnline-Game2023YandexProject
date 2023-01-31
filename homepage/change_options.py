@@ -85,7 +85,7 @@ class Settings:
             if button.startswith('button'):
                 if self.__dict__[button].is_button_down(event.pos):
                     if button == 'button_home':
-                        homepage()
+                        homepage(self.user)
 
     def pointing_button(self, event):
         for button in self.__dict__:
@@ -94,7 +94,7 @@ class Settings:
                     return button
 
 
-def settings():
+def settings(user):
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    screensaver = Settings(screen, 123)
+    screensaver = Settings(screen, user)
     screensaver.start_screen()
