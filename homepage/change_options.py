@@ -5,20 +5,11 @@ from core.screen_operation import terminate
 from settings import HEIGHT, WIDTH
 
 
-def draw_buttons_for_settings(screen, font, text_y, parent_text):
+def draw_buttons_for_settings(self, name, text_y, parent_text):
     text_y = text_y - parent_text.get_height() // 2
     for i in range(1, 11):
-        text = font.render(f'{i}', True, (100, 255, 100))
         text_x = WIDTH // 10 * i // 1.4 + 5 + parent_text.get_width()
-        text_w = text.get_width()
-        text_h = text.get_height()
-        screen.blit(text, (text_x, text_y))
-        pygame.draw.rect(
-            screen,
-            (255, 255, 255),
-            (text_x - 10, text_y - 10, text_w + 20, text_h + 20),
-            1
-        )
+        setattr(self, f'button_{name}{i}', Button(text_x - 10, text_y - 10, f'numbers/{i}.png'))
 
 
 class Settings:
@@ -39,16 +30,14 @@ class Settings:
         music_x = 10
         music_y = HEIGHT // 2.5 - music_text.get_height() // 2
         self.screen.blit(music_text, (music_x, music_y))
-
-        draw_buttons_for_settings(self.screen, font, HEIGHT // 2.5, music_text)
+        draw_buttons_for_settings(self, 'music', HEIGHT // 2.5, music_text)
 
         sound_text = font.render('Звуки', True, (220, 20, 60))
         sound_x = 15
         sound_y = HEIGHT // 1.5 - sound_text.get_height() // 2
         self.screen.blit(sound_text, (sound_x, sound_y))
 
-        draw_buttons_for_settings(self.screen, font, HEIGHT // 1.5, music_text)
-
+        draw_buttons_for_settings(self, 'sound', HEIGHT // 1.5, music_text)
         self.button_home = Button(20, 20, 'garage/home.png')
         pointing_b = None
         while True:
@@ -81,11 +70,12 @@ class Settings:
     def push_button(self, event):
         from homepage.screensaver import homepage
         for button in self.__dict__:
-            print(button, self.__dict__[button])
             if button.startswith('button'):
                 if self.__dict__[button].is_button_down(event.pos):
                     if button == 'button_home':
                         homepage(self.user)
+                    print(button)
+
 
     def pointing_button(self, event):
         for button in self.__dict__:
