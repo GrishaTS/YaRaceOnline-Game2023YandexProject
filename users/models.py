@@ -9,7 +9,7 @@ class UserModel:
         con = sqlite3.connect(DATABASE)
         request = f''' SELECT
                           coins, music, sounds,
-                          record, password
+                          record, password, id, selected_car
                       FROM user
                       WHERE login = '{login}'
                    '''
@@ -79,6 +79,8 @@ class User:
             self.sounds = user_data[2]
             self.record = user_data[3]
             self.password = user_data[4]
+            self.id = user_data[5]
+            self.selected_car = user_data[6]
         except LookupError:
             self.user_data = user_data
 

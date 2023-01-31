@@ -14,8 +14,6 @@ IMAGES = {
                         (100, 100),
                     )
 }
-user_id = 4
-user_coins = 300
 
 
 class Car:
@@ -27,17 +25,16 @@ class Car:
         self.velocity = velocity
         self.user = user
         self.locked = (car_id,) in list(sqlite3.connect('db.sqlite3').execute(
-            f'SELECT garage_id FROM user_garage WHERE user_id = {user_id}'
+            f'SELECT garage_id FROM user_garage WHERE user_id = {self.user.id}'
         ))
 
     def buy(self):
-        global user_coins
-        user_coins -= self.price
+        self.user.coins = self.user.coins - self.price
         self.locked = True
         db_connect = sqlite3.connect('db.sqlite3')
         db_connect.execute(
-            f'INSERT INTO user_garage (user_id, garage_id) VALUES ({user_id},'
-            f' {self.id});'  # user.id
+            f'INSERT INTO user_garage (user_id, garage_id) VALUES '
+            f'({self.user.id}, {self.id});'
         )
         db_connect.commit()
 
@@ -49,17 +46,14 @@ class Garage:
         for car in sqlite3.connect(
             'db.sqlite3'
         ).execute('SELECT * FROM garage'):
-            self.__dict__[f'car{car[0]}'] = Car(*car, user_id)
+            self.__dict__[f'car{car[0]}'] = Car(*car, self.user)
         self.button_home = Button(20, 20, 'garage/home.png')
 
     def start_screen(self):
-        font_s = pygame.font.Font(None, 50)
+        font_s = pygame.font.Font(None, 40)
         text_s = font_s.render('Selected', True, '#54bd42')
         text_w_s = text_s.get_width()
         text_h_s = text_s.get_height()
-        active_car = 1  # self.user.active_car = 2
-        pygame.mixer.music.load(f'audio/music/{active_car}.ogg')
-        pygame.mixer.music.play(-1)
         pointing_b = None
         while True:
             for event in pygame.event.get():
@@ -69,16 +63,16 @@ class Garage:
                     event.type == pygame.MOUSEBUTTONDOWN
                     and event.button == 1
                 ):
-                    new_car = self.push_button(event, active_car)
-                    if new_car != active_car:
-                        active_car = new_car
+                    new_car = self.push_button(event, self.user.selected_car)
+                    if new_car != self.user.selected_car:
+                        self.user['selected_car'] = new_car
                         pygame.mixer.music.load(
-                            f'audio/music/{active_car}.ogg'
+                            f'audio/music/{self.user.selected_car}.ogg'
                         )
                         pygame.mixer.music.play(-1)
                 elif event.type == pygame.MOUSEMOTION:
                     pointing_b = self.pointing_button(event)
-            car = self.__dict__[f'car{active_car}']
+            car = self.__dict__[f'car{self.user.selected_car}']
             x_selected = car.btn.x + car.btn.image_x / 2 - 50
             y_selected = car.btn.y - 40
             fon = pygame.transform.scale(IMAGES['backgroung'], (WIDTH, HEIGHT))
@@ -100,19 +94,7 @@ class Garage:
                         )
                     self.screen.blit(btn_img, (btn.x, btn.y))
 
-                    btn_unlocked = pygame.transform.scale(
-                        load_image('garage/lock.png'),
-                        (100, 100),
-                    )
-                    self.screen.blit(
-                        btn_unlocked,
-                        (
-                            btn.x + btn.image_x / 2,
-                            btn.y + btn.image_y / 2 - 50,
-                        ),
-                    )
-
-            text_c = font_s.render(f'{user_coins}$', True, '#54bd42')
+            text_c = font_s.render(f'{self.user.coins}$', True, '#54bd42')
             text_w_c = text_s.get_width()
             text_h_c = text_s.get_height()
             x_c = 1160
@@ -123,7 +105,7 @@ class Garage:
                 (
                     x_c - 10,
                     y_c - 10,
-                    text_w_c - 45,
+                    text_w_c - 35,
                     text_h_c + 20,
                 ),
                 1,
@@ -151,6 +133,18 @@ class Garage:
                             (btn.image_x, btn.image_y),
                         ),
                         (btn.x, btn.y),
+                    )
+                    naming_car = font_s.render(
+                        f'{car.model} - {car.velocity}км/ч',
+                        True,
+                        'black',
+                    )
+                    self.screen.blit(
+                        naming_car,
+                        (
+                            btn.x + (btn.image_x - naming_car.get_width()) / 2,
+                            346 if btn.y <= 200 else 695,
+                        ),
                     )
                     if not car.locked:
                         self.screen.blit(
@@ -183,7 +177,7 @@ class Garage:
                     return self.choice_car(self.__dict__[btn], active_car)
             elif btn.startswith('button'):
                 if self.__dict__[btn].is_button_down(event.pos):
-                    homepage(self.user)
+                    homepage(self.user, music=False)
         return active_car
 
     def pointing_button(self, event):
@@ -195,13 +189,13 @@ class Garage:
     def choice_car(self, car, active_car):
         if (car.id,) in list(
             sqlite3.connect('db.sqlite3').execute(
-                f'SELECT garage_id FROM user_garage WHERE user_id = {user_id}'
+                'SELECT garage_id FROM user_garage WHERE'
+                f' user_id = {self.user.id}'
             )
         ):
-            # self.user.active_car = id
             return car.id
         else:
-            if user_coins >= car.price:
+            if self.user.coins >= car.price:
                 car.buy()
                 return car.id
             return active_car
