@@ -6,7 +6,7 @@ from core.exceptions import ValidationError
 from core.validators import validate_password
 from homepage.screensaver import homepage
 from settings import DATABASE
-from users.models import users_model
+from users.models import User, users_model
 from users.sign_up.templates.sign_up_template import Ui_SigningUp
 from users.sign_up.validators import validate_agreement, validate_login
 
@@ -29,6 +29,7 @@ class SignUpWidget(QMainWindow, Ui_SigningUp):
         password1 = self.password_sign_up_edit.text()
         password2 = self.password2_sign_up_edit.text()
         agreement = self.confirm_personal_data_checkbox.isChecked()
+        user = User(login)
 
         login = self.validate_show_message(
             login,
@@ -52,9 +53,8 @@ class SignUpWidget(QMainWindow, Ui_SigningUp):
             password=password,
         )
         con.commit()
-        user_data = ...
-        homepage(user_data)
         self.hide()
+        homepage(user)
 
     def validate_show_message(self, *data, validate_func, con=None):
         try:
