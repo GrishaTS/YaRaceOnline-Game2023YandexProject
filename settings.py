@@ -1,1 +1,4 @@
 SIZE = WIDTH, HEIGHT = 1280, 720
+
+
+DATABASE = 'db.sqlite3'
