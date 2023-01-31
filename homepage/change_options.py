@@ -69,13 +69,12 @@ class Settings:
 
     def push_button(self, event):
         from homepage.screensaver import homepage
+
         for button in self.__dict__:
             if button.startswith('button'):
                 if self.__dict__[button].is_button_down(event.pos):
                     if button == 'button_home':
                         homepage(self.user)
-                    print(button)
-
 
     def pointing_button(self, event):
         for button in self.__dict__:

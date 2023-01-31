@@ -19,7 +19,8 @@ class Manager:
         # 'button_road': lambda x: x,
     }
 
-    def __init__(self, screen, user):
+    def __init__(self, screen, user, music):
+        self.music = music
         self.user = user
         self.screen = screen
         self.button_settings = Button(1200, 20, 'screensaver/settings.png')
@@ -27,6 +28,11 @@ class Manager:
         self.button_road = Button(20, 20, 'screensaver/road.png')
 
     def start_screen(self):
+        if self.music:
+            pygame.mixer.music.load(
+                f'audio/music/{self.user.selected_car}.ogg'
+            )
+            pygame.mixer.music.play(-1)
         pointing_b = None
         while True:
             for event in pygame.event.get():
@@ -73,8 +79,9 @@ class Manager:
                     return button
 
 
-def homepage(user):
+
+def homepage(user, music=True):
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    screensaver = Manager(screen, user)
+    screensaver = Manager(screen, user, music)
     screensaver.start_screen()
