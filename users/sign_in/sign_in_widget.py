@@ -43,8 +43,8 @@ class SignInWidget(QMainWindow, Ui_SigningIn):
             return
 
         user_data = ...
-        homepage(user_data)
         self.hide()
+        homepage(user_data)
 
     def sign_up(self):
         self.form = SignUpWidget()

@@ -67,7 +67,7 @@ class User:
         self.login = login
         user_data = users_model.select_user(login=login)
         error_message = (
-            'There is not user with such login'
+            'There is not user with such login '
             'or there are more than one user with such login'
         )
         assert len(user_data) == 1, error_message
@@ -90,7 +90,3 @@ class User:
     @property
     def all_data(self):
         return self.user_data
-
-user1 = User('admin123')
-user1.sounds = 6
-print(user1.sounds, type(user.sounds))
