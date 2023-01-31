@@ -29,7 +29,6 @@ class SignUpWidget(QMainWindow, Ui_SigningUp):
         password1 = self.password_sign_up_edit.text()
         password2 = self.password2_sign_up_edit.text()
         agreement = self.confirm_personal_data_checkbox.isChecked()
-        user = User(login)
 
         login = self.validate_show_message(
             login,
@@ -52,6 +51,7 @@ class SignUpWidget(QMainWindow, Ui_SigningUp):
             login=login,
             password=password,
         )
+        user = User(login)
         con.commit()
         self.hide()
         homepage(user)
