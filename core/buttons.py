@@ -6,6 +6,19 @@ class Button:
         self.x = x
         self.y = y
         self.image = load_image(image)
+
+        # from PIL import Image, ImageEnhance ######## make less contrast photo
+        # print(image.split('/')[1].split('.')[0])
+        # im = Image.open(f'images/{image}')
+        # enhancer = ImageEnhance.Contrast(im)
+        # factor = 0.2
+        # im_output = enhancer.enhance(factor)
+        # im_output.save(f'images/{image.split("/")[0]}/{image.split("/")[1].split(".")[0]}_pointing.png')
+
+        self.pointing_image = load_image(
+            f'{image.split("/")[0]}/'
+            f'{image.split("/")[1].split(".")[0]}_pointing.png'
+        )
         self.image_x, self.image_y = self.image.get_size()
 
     def is_button_down(self, pos):

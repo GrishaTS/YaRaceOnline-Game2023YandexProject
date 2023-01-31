@@ -58,12 +58,26 @@ class Garage:
         text_w_s = text_s.get_width()
         text_h_s = text_s.get_height()
         active_car = 1  # self.user.active_car = 2
+        pygame.mixer.music.load(f'audio/music/{active_car}.ogg')
+        pygame.mixer.music.play(-1)
+        pointing_b = None
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     terminate()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    active_car = self.push_button(event, active_car)
+                elif (
+                    event.type == pygame.MOUSEBUTTONDOWN
+                    and event.button == 1
+                ):
+                    new_car = self.push_button(event, active_car)
+                    if new_car != active_car:
+                        active_car = new_car
+                        pygame.mixer.music.load(
+                            f'audio/music/{active_car}.ogg'
+                        )
+                        pygame.mixer.music.play(-1)
+                elif event.type == pygame.MOUSEMOTION:
+                    pointing_b = self.pointing_button(event)
             car = self.__dict__[f'car{active_car}']
             x_selected = car.btn.x + car.btn.image_x / 2 - 50
             y_selected = car.btn.y - 40
@@ -74,10 +88,16 @@ class Garage:
             for button in self.__dict__:
                 if button.startswith('button'):
                     btn = self.__dict__[button]
-                    btn_img = pygame.transform.scale(
-                        btn.image,
-                        (btn.image_x, btn.image_y),
-                    )
+                    if button == pointing_b:
+                        btn_img = pygame.transform.scale(
+                            btn.pointing_image,
+                            (btn.image_x, btn.image_y),
+                        )
+                    else:
+                        btn_img = pygame.transform.scale(
+                            btn.image,
+                            (btn.image_x, btn.image_y),
+                        )
                     self.screen.blit(btn_img, (btn.x, btn.y))
 
             text_c = font_s.render(f'{user_coins}$', True, '#54bd42')
@@ -153,6 +173,12 @@ class Garage:
                 if self.__dict__[btn].is_button_down(event.pos):
                     homepage()
         return active_car
+
+    def pointing_button(self, event):
+        for button in self.__dict__:
+            if button.startswith('button'):
+                if self.__dict__[button].is_button_down(event.pos):
+                    return button
 
     def choice_car(self, car, active_car):
         if (car.id,) in list(
