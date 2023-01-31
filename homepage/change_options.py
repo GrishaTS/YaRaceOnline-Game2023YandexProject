@@ -1,5 +1,6 @@
 import pygame
 
+from core.buttons import Button
 from core.screen_operation import terminate
 from settings import HEIGHT, WIDTH
 
@@ -48,19 +49,49 @@ class Settings:
 
         draw_buttons_for_settings(self.screen, font, HEIGHT // 1.5, music_text)
 
+        self.button_home = Button(20, 20, 'garage/home.png')
+        pointing_b = None
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     terminate()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
+                elif (
+                    event.type == pygame.MOUSEBUTTONDOWN
+                    and event.button == 1
+                ):
                     self.push_button(event)
+                elif event.type == pygame.MOUSEMOTION:
+                    pointing_b = self.pointing_button(event)
+            for button in self.__dict__:
+                if button.startswith('button'):
+                    btn = self.__dict__[button]
+                    if button == pointing_b:
+                        btn_img = pygame.transform.scale(
+                            btn.pointing_image,
+                            (btn.image_x, btn.image_y),
+                        )
+                    else:
+                        btn_img = pygame.transform.scale(
+                            btn.image,
+                            (btn.image_x, btn.image_y),
+                        )
+                    self.screen.blit(btn_img, (btn.x, btn.y))
             pygame.display.flip()
 
     def push_button(self, event):
+        from homepage.screensaver import homepage
+        for button in self.__dict__:
+            print(button, self.__dict__[button])
+            if button.startswith('button'):
+                if self.__dict__[button].is_button_down(event.pos):
+                    if button == 'button_home':
+                        homepage()
+
+    def pointing_button(self, event):
         for button in self.__dict__:
             if button.startswith('button'):
                 if self.__dict__[button].is_button_down(event.pos):
-                    print('grisha loh')
+                    return button
 
 
 def settings():
