@@ -1,0 +1,73 @@
+[
+{
+  "model": "garage",
+  "pk": 1,
+  "fields": {
+    "model": "Fleetwood Bounder RV 1986",
+    "photo": "garage/side_view/1.png",
+    "price": 0,
+    "velocity": 70,
+    "x": 57,
+    "y": 157
+  }
+},
+{
+  "model": "garage",
+  "pk": 2,
+  "fields": {
+    "model": "Mach 5",
+    "photo": "garage/side_view/2.png",
+    "price": 100,
+    "velocity": 100,
+    "x": 465,
+    "y": 200
+  }
+},
+{
+  "model": "garage",
+  "pk": 3,
+  "fields": {
+    "model": "Lightning McQueen",
+    "photo": "garage/side_view/3.png",
+    "price": 250,
+    "velocity": 170,
+    "x": 873,
+    "y": 153
+  }
+},
+{
+  "model": "garage",
+  "pk": 4,
+  "fields": {
+    "model": "Chevrolet Camaro",
+    "photo": "garage/side_view/4.png",
+    "price": 400,
+    "velocity": 250,
+    "x": 57,
+    "y": 534
+  }
+},
+{
+  "model": "garage",
+  "pk": 5,
+  "fields": {
+    "model": "Chevrolet Impala",
+    "photo": "garage/side_view/5.png",
+    "price": 800,
+    "velocity": 327,
+    "x": 465,
+    "y": 570
+  }
+},{
+  "model": "garage",
+  "pk": 6,
+  "fields": {
+    "model": "DeLorean DMC-12",
+    "photo": "garage/side_view/1.png",
+    "price": 1500,
+    "velocity": 880,
+    "x": 873,
+    "y": 498
+  }
+}
+]

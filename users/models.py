@@ -52,8 +52,8 @@ class UserModel:
     def insert_user(*, login, password):
         con = sqlite3.connect(DATABASE)
         request = f'''INSERT INTO user
-                          ('login', 'password')
-                      VALUES ('{login}', '{password}')
+                          ('login', 'password', selected_car, coins)
+                      VALUES ('{login}', '{password}', 1, 0)
                    '''
         con.execute(request)
         con.commit()
@@ -66,11 +66,6 @@ class User:
     def __init__(self, login):
         self.login = login
         user_data = users_model.select_user(login=login)
-        error_message = (
-            'There is not user with such login '
-            'or there are more than one user with such login'
-        )
-        assert len(user_data) == 1, error_message
         try:
             user_data = user_data[0]
             self.user_data = user_data
