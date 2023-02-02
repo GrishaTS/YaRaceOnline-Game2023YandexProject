@@ -1,5 +1,6 @@
 import pygame
 
+from core.audio import sounds
 from core.buttons import Button
 from core.screen_operation import terminate
 from settings import HEIGHT, WIDTH
@@ -9,7 +10,11 @@ def draw_buttons_for_settings(self, name, text_y, parent_text):
     text_y = text_y - parent_text.get_height() // 2
     for i in range(1, 11):
         text_x = WIDTH // 10 * i // 1.4 + 5 + parent_text.get_width()
-        setattr(self, f'button_{name}{i}', Button(text_x - 10, text_y - 10, f'numbers/{i}.png'))
+        setattr(
+            self,
+            f'button_{name}{i}',
+            Button(text_x - 10, text_y - 10, f'numbers/{i}.png'),
+        )
 
 
 class Settings:
@@ -75,6 +80,13 @@ class Settings:
                 if self.__dict__[button].is_button_down(event.pos):
                     if button == 'button_home':
                         homepage(self.user)
+                    elif 'music' in button:
+                        value = int(button.split('music')[1])
+                        pygame.mixer.music.set_volume(value / 10)
+                    elif 'sound' in button:
+                        value = int(button.split('sound')[1])
+                        for i in sounds:
+                            sounds[i].set_volume(value / 10)
 
     def pointing_button(self, event):
         for button in self.__dict__:

@@ -31,7 +31,7 @@ class Car:
         ))
 
     def buy(self):
-        self.user.coins = self.user.coins - self.price
+        self.user['coins'] = self.user.coins - self.price
         self.locked = True
         db_connect = sqlite3.connect('db.sqlite3')
         db_connect.execute(
@@ -164,7 +164,7 @@ class Garage:
                         self.screen.blit(
                             text_price,
                             (
-                                btn.x + btn.image_x / 2 + 10,
+                                btn.x + btn.image_x / 2 + 17,
                                 btn.y + btn.image_y / 2 + 20,
                             ),
                         )
