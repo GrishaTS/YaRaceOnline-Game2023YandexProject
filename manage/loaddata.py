@@ -24,7 +24,7 @@ class Model:
 
 def loaddata(file):
     if not file.endswith('.json'):
-        raise FixtureError('Only load file with json extension')
+        raise FixtureError('Load file only with json extension')
     with open(file) as reading_file:
         data = json.load(reading_file)
         for entry in data:

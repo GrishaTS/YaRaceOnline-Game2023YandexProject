@@ -9,7 +9,11 @@ def draw_buttons_for_settings(self, name, text_y, parent_text):
     text_y = text_y - parent_text.get_height() // 2
     for i in range(1, 11):
         text_x = WIDTH // 10 * i // 1.4 + 5 + parent_text.get_width()
-        setattr(self, f'button_{name}{i}', Button(text_x - 10, text_y - 10, f'numbers/{i}.png'))
+        setattr(
+            self,
+            f'button_{name}{i}',
+            Button(text_x - 10, text_y - 10, f'numbers/{i}.png')
+        )
 
 
 class Settings:
