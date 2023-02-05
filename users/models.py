@@ -52,8 +52,9 @@ class UserModel:
     def insert_user(*, login, password):
         con = sqlite3.connect(DATABASE)
         request = f'''INSERT INTO user
-                          ('login', 'password', selected_car, coins)
-                      VALUES ('{login}', '{password}', 1, 0)
+                          ('login', 'password', selected_car, coins
+                           selected_music, selected_sounds)
+                      VALUES ('{login}', '{password}', 1, 0, 5, 5)
                    '''
         con.execute(request)
         con.commit()
@@ -76,6 +77,8 @@ class User:
             self.password = user_data[4]
             self.id = user_data[5]
             self.selected_car = user_data[6]
+            self.selected_music = user_data[7]
+            self.selected_sounds = user_data[8]
         except LookupError:
             self.user_data = user_data
 

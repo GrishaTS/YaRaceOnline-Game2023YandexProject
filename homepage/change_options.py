@@ -4,12 +4,13 @@ from core.audio import sounds
 from core.buttons import Button
 from core.screen_operation import terminate
 from settings import HEIGHT, WIDTH
+from users.models import users_model
 
 
 def draw_buttons_for_settings(self, name, text_y, parent_text):
     text_y = text_y - parent_text.get_height() // 2
-    for i in range(1, 11):
-        text_x = WIDTH // 10 * i // 1.4 + 5 + parent_text.get_width()
+    for i in range(11):
+        text_x = WIDTH // 10 * i // 1.4 + 50 + parent_text.get_width()
         setattr(
             self,
             f'button_{name}{i}',
@@ -35,6 +36,7 @@ class Settings:
         music_x = 10
         music_y = HEIGHT // 2.5 - music_text.get_height() // 2
         self.screen.blit(music_text, (music_x, music_y))
+
         draw_buttons_for_settings(self, 'music', HEIGHT // 2.5, music_text)
 
         sound_text = font.render('Звуки', True, (220, 20, 60))
@@ -82,9 +84,11 @@ class Settings:
                         homepage(self.user, music=False)
                     elif 'music' in button:
                         value = int(button.split('music')[1])
+                        self.user['selected_music'] = value
                         pygame.mixer.music.set_volume(value / 10)
                     elif 'sound' in button:
                         value = int(button.split('sound')[1])
+                        self.user['selected_sounds'] = value
                         for i in sounds:
                             sounds[i].set_volume(value / 10)
 
