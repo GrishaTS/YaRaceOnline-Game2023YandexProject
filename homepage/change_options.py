@@ -79,7 +79,7 @@ class Settings:
             if button.startswith('button'):
                 if self.__dict__[button].is_button_down(event.pos):
                     if button == 'button_home':
-                        homepage(self.user)
+                        homepage(self.user, music=False)
                     elif 'music' in button:
                         value = int(button.split('music')[1])
                         pygame.mixer.music.set_volume(value / 10)
