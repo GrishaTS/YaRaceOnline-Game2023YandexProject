@@ -7,8 +7,7 @@ import pygame
 from core.audio import sounds
 from core.load_file import load_image
 from settings import HEIGHT, WIDTH
-
-
+from users.models import User
 
 
 class Finish(pygame.sprite.Sprite):
@@ -85,7 +84,7 @@ class Car(pygame.sprite.Sprite):
 
 
 class Game:
-    def __init__(self, screen, user, socket_server):
+    def __init__(self, screen, user, socket_server, new_user):
         self.screen = screen
         self.finish = []
         self.barriers = []
@@ -98,10 +97,10 @@ class Game:
             f'garage/top_view/{user.selected_car}.png',
             user.selected_car,
         )
-        self.oponnent_car = Car(
+        self.opponent_car = Car(
             900,
-            f'garage/top_view/{user.selected_car}.png',
-            user.selected_car,
+            f'garage/top_view/{new_user.selected_car}.png',
+            new_user.selected_car,
         )
         self.bg_photo = load_image('game/road_example.jpg')
         self.bg_y = 0
@@ -124,23 +123,24 @@ class Game:
     def draw_start(self, k):
         self.screen.fill('black')
         self.screen.blit(self.bg_photo, (0, self.bg_y))
-        btn_img = pygame.transform.scale(
-            self.car.image,
-            self.car.image.get_size(),
-        )
-        self.screen.blit(
-            btn_img,
-            (
-                (
-                    self.car.rect.x -
-                    (
-                        self.car.image.get_width()
-                        - self.car.base_image.get_width()
-                    ) // 2
-                ),
-                420,
+        for car in [self.car, self.opponent_car]:
+            btn_img = pygame.transform.scale(
+                car.image,
+                car.image.get_size(),
             )
-        )
+            self.screen.blit(
+                btn_img,
+                (
+                    (
+                        car.rect.x -
+                        (
+                            car.image.get_width()
+                            - car.base_image.get_width()
+                        ) // 2
+                    ),
+                    420,
+                )
+            )
         font_s = pygame.font.Font(None, 400)
         text_price = font_s.render(
             f'{k}',
@@ -244,7 +244,7 @@ class Game:
                 )
             for i in to_del:
                 items.remove(i)
-        for car in [self.oponnent_car, self.car]:
+        for car in [self.opponent_car, self.car]:
             btn_img = pygame.transform.scale(
                 car.image,
                 car.image.get_size(),
@@ -354,25 +354,21 @@ class Game:
 
 def race(user):
     name = user.login
-    socket_server = socket.socket()
     try:
+        socket_server = socket.socket()
         socket_server.connect(('192.168.0.14', 8000))
         socket_server.send(name.encode('utf-8'))
-        server = socket_server.recv(1024).decode('utf-8')
-        print(f'{server} has joined')
+        new_user = User(socket_server.recv(1024).decode('utf-8'))
     except ConnectionRefusedError:
+        socket_server = socket.socket()
         socket_server.bind(('0.0.0.0', 8000))
         socket_server.listen(1)
         print('Server is running')
-        conn, add = socket_server.accept()
-        client = conn.recv(1024).decode('utf-8')
-        print(f'{client} has joined')
-
-
-
-
+        socket_server, add = socket_server.accept()
+        new_user = User(socket_server.recv(1024).decode('utf-8'))
+        socket_server.send(name.encode('utf-8'))
 
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    game = Game(screen, user, socket_server)
+    game = Game(screen, user, socket_server, new_user)
     game.start_screen()
