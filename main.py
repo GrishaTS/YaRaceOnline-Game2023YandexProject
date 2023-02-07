@@ -21,6 +21,7 @@ args = parser.parse_args()
 if args.loaddata is not None:
     loaddata(args.loaddata)
 
+
 if __name__ == '__main__' and args.loaddata is None:
     app = QApplication(sys.argv)
     ex = SignInWidget()
