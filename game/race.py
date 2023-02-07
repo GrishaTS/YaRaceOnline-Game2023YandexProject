@@ -1,4 +1,3 @@
-import random
 import sys
 import time
 
@@ -9,6 +8,30 @@ from core.load_file import load_image
 from settings import HEIGHT, WIDTH
 
 
+class Finish(pygame.sprite.Sprite):
+    image = load_image('game/other/finish.jpg')
+
+    def __init__(self):
+        super(Finish, self).__init__()
+        self.image = Finish.image
+        self.rect = self.image.get_rect()
+        self.rect.x = 208
+        self.rect.y = -100
+        self.mask = pygame.mask.from_surface(self.image)
+
+
+class Coin(pygame.sprite.Sprite):
+    image = load_image('game/other/coin.png')
+
+    def __init__(self, x):
+        super(Coin, self).__init__()
+        self.image = Coin.image
+        self.rect = self.image.get_rect()
+        self.rect.x = [262, 437, 632, 835][x] + 70
+        self.rect.y = -70
+        self.mask = pygame.mask.from_surface(self.image)
+
+
 class Barrier(pygame.sprite.Sprite):
     image = load_image('game/barriers/1.png')
 
@@ -16,15 +39,15 @@ class Barrier(pygame.sprite.Sprite):
         super(Barrier, self).__init__()
         self.image = Barrier.image
         self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = -50
+        self.rect.x = [262, 437, 632, 835][x] + 70
+        self.rect.y = -70
         self.mask = pygame.mask.from_surface(self.image)
 
 
 class Car(pygame.sprite.Sprite):
-    def __init__(self, x, file):
+    def __init__(self, x, file, car_id):
         super(Car, self).__init__()
-        self.max_velocity = 30
+        self.max_velocity = 30 - (7 - car_id) * 2
         self.velocity = 0
         self.angle = 0
         self.base_image = load_image(file)
@@ -61,11 +84,20 @@ class Car(pygame.sprite.Sprite):
 class Game:
     def __init__(self, screen, user):
         self.screen = screen
+        self.finish = []
         self.barriers = []
+        self.coins = []
+        self.start_coin = user.coins
         self.user = user
-        self.car = Car(700, f'garage/top_view/{user.selected_car}.png')
+        self.car = Car(
+            700,
+            f'garage/top_view/{user.selected_car}.png',
+            user.selected_car,
+        )
         self.bg_photo = load_image('game/road_example.jpg')
         self.bg_y = 0
+        # self.level = random.randrange(1, 10)
+        self.level = 1
 
     def start_race(self):
         k = 3
@@ -119,6 +151,9 @@ class Game:
         flag = False
         clock = pygame.time.Clock()
         self.start_race()
+        self.start_race_time = time.time()
+        self.map_race = open(f'game/levels/{self.level}.txt').read().split()
+        self.map_i = 0
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -127,7 +162,10 @@ class Game:
                 elif event.type == pygame.KEYDOWN:
                     flag = False
                     key = event.__dict__.get('unicode')
-                    if type(key) is str and key in 'фцвыawdsAWDSФЦВЫ':
+                    if (
+                        type(key) is str and
+                        key != '' and key in 'фцвыawdsAWDSФЦВЫ'
+                    ):
                         for _ in range(2):
                             self.car.move(key)
                             self.draw()
@@ -135,7 +173,10 @@ class Game:
                 elif event.type == pygame.TEXTINPUT:
                     flag = False
                     key = event.__dict__.get('text')
-                    if type(key) is str and key in 'фцвыawdsAWDSФЦВЫ':
+                    if (
+                        type(key) is str and
+                        key != '' and key in 'фцвыawdsAWDSФЦВЫ'
+                    ):
                         self.car.move(key)
                 elif event.type == pygame.KEYUP:
                     flag = True
@@ -150,73 +191,46 @@ class Game:
                         self.car.angle = 0
                 self.car.move_angle()
             self.check_crash()
+            self.bg_y += self.car.velocity
+            if self.bg_y >= 720:
+                self.map_i += 1
+                self.bg_y = 0
+                next_m = list(
+                    filter(
+                        lambda x: x[0] in ['B', 'C', '-'],
+                        zip(list(self.map_race[self.map_i]), range(4))
+                    )
+                )
+                for i in next_m:
+                    if i[0] == '-':
+                        self.finish.append(Finish())
+                        break
+                    if i[0] == 'B':
+                        self.barriers.append(Barrier(i[1]))
+                    if i[0] == 'C':
+                        self.coins.append(Coin(i[1]))
             self.draw()
             clock.tick(50)
 
-    def check_crash(self):
-        clock = pygame.time.Clock()
-        flag = False
-        for barrier in self.barriers:
-            if pygame.sprite.collide_mask(self.car, barrier):
-                flag = True
-                del self.barriers[self.barriers.index(barrier)]
-                break
-        if (
-            (
-                self.car.rect.x -
-                (
-                    self.car.image.get_width()
-                    - self.car.base_image.get_width()
-                ) // 2
-            ) < 207 or
-            (
-                self.car.rect.x +
-                (
-                    self.car.image.get_width() +
-                    self.car.base_image.get_width()
-                ) // 2 > 1100
-            ) or
-            flag
-        ):
-            sounds['crash'].play()
-            if not flag:
-                self.car.rect.x = 600
-            self.car.velocity = 1
-            for i in range(20):
-                if i % 2:
-                    self.car.image.set_alpha(50)
-                else:
-                    self.car.image.set_alpha(100)
-                self.draw()
-                clock.tick(50)
-
     def draw(self):
         self.screen.fill('black')
-        self.bg_y += self.car.velocity
         self.screen.blit(self.bg_photo, (0, self.bg_y))
         self.screen.blit(self.bg_photo, (0, self.bg_y - 720))
-        to_del = []
-        for i in range(len(self.barriers)):
-            barrier = self.barriers[i]
-            barrier.rect.y += self.car.velocity
-            if barrier.rect.y > 730:
-                to_del.append(i)
-            self.screen.blit(
-                pygame.transform.scale(
-                    barrier.image,
-                    barrier.image.get_size(),
-                ),
-                (barrier.rect.x, barrier.rect.y),
-            )
-        for i in to_del:
-            del self.barriers[i]
-        if self.bg_y >= 719:
-            self.barriers.append(
-                Barrier(
-                    random.randrange(300, 1000),
-                ),
-            )
-            self.bg_y = 0
+        for items in [self.barriers, self.coins, self.finish]:
+            to_del = []
+            for item in items:
+                item.rect.y += self.car.velocity
+                if item.rect.y > 730:
+                    to_del.append(item)
+                self.screen.blit(
+                    pygame.transform.scale(
+                        item.image,
+                        item.image.get_size(),
+                    ),
+                    (item.rect.x, item.rect.y),
+                )
+            for i in to_del:
+                items.remove(i)
         btn_img = pygame.transform.scale(
             self.car.image,
             self.car.image.get_size(),
@@ -253,6 +267,75 @@ class Game:
         )
         self.screen.blit(text_c, (x_c, y_c))
         pygame.display.flip()
+
+    def check_crash(self):
+        clock = pygame.time.Clock()
+        flag = False
+        for barrier in self.barriers:
+            if pygame.sprite.collide_mask(self.car, barrier):
+                flag = True
+                del self.barriers[self.barriers.index(barrier)]
+        for coin in self.coins:
+            if pygame.sprite.collide_mask(self.car, coin):
+                del self.coins[self.coins.index(coin)]
+                sounds['get coin'].play()
+                self.user['coins'] = self.user.coins + 100
+        if self.finish:
+            if self.finish[0].rect.y > 650:
+                from homepage.screensaver import homepage
+                self.end_race((time.time() - self.start_race_time) // 1)
+                homepage(self.user, music=False)
+        if (
+            (
+                self.car.rect.x -
+                (
+                    self.car.image.get_width()
+                    - self.car.base_image.get_width()
+                ) // 2
+            ) < 207 or
+            (
+                self.car.rect.x +
+                (
+                    self.car.image.get_width() +
+                    self.car.base_image.get_width()
+                ) // 2 > 1100
+            ) or
+            flag
+        ):
+            sounds['crash'].play()
+            if not flag:
+                self.car.rect.x = 600
+            self.car.velocity = 1
+            for i in range(20):
+                if i % 2:
+                    self.car.image.set_alpha(50)
+                else:
+                    self.car.image.set_alpha(100)
+                self.draw()
+                clock.tick(50)
+
+    def end_race(self, race_time):
+        if self.user.record > race_time:
+            self.user.record = race_time
+            font_s = pygame.font.Font(None, 100)
+            text_c = font_s.render(
+                f'Новый рекорд: {round(self.user.record, 2)}с', True, 'red'
+            )
+            x_c = (WIDTH - text_c.get_width()) / 2
+            y_c = 40
+            self.screen.blit(text_c, (x_c, y_c))
+        font_s = pygame.font.Font(None, 100)
+        text_c = font_s.render(
+            f'Вы заработали {self.user.coins - self.start_coin}$',
+            True,
+            'red',
+        )
+        x_c = (WIDTH - text_c.get_width()) / 2
+        y_c = 100
+        self.screen.blit(text_c, (x_c, y_c))
+        sounds['win'].play()
+        pygame.display.flip()
+        time.sleep(3)
 
 
 def race(user):

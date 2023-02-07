@@ -8,8 +8,8 @@ class UserModel:
     def select_user(*, login):
         con = sqlite3.connect(DATABASE)
         request = f''' SELECT
-                          coins, music, sounds,
-                          record, password, id, selected_car
+                          id, coins, record, selected_car, password,
+                          selected_music, selected_sounds
                       FROM user
                       WHERE login = '{login}'
                    '''
@@ -67,18 +67,15 @@ class User:
     def __init__(self, login):
         self.login = login
         user_data = users_model.select_user(login=login)
+        attribute = [
+            'id', 'coins', 'record', 'selected_car', 'password',
+            'selected_music', 'selected_sounds',
+        ]
         try:
             user_data = user_data[0]
             self.user_data = user_data
-            self.coins = user_data[0]
-            self.music = user_data[1]
-            self.sounds = user_data[2]
-            self.record = user_data[3]
-            self.password = user_data[4]
-            self.id = user_data[5]
-            self.selected_car = user_data[6]
-            self.selected_music = user_data[7]
-            self.selected_sounds = user_data[8]
+            for i in range(len(attribute)):
+                self.__dict__[attribute[i]] = user_data[i]
         except LookupError:
             self.user_data = user_data
 

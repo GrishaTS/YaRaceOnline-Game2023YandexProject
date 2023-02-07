@@ -4,7 +4,6 @@ from core.audio import sounds
 from core.buttons import Button
 from core.screen_operation import terminate
 from settings import HEIGHT, WIDTH
-from users.models import users_model
 
 
 def draw_buttons_for_settings(self, name, text_y, parent_text):
