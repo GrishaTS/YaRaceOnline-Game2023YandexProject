@@ -1,20 +1,24 @@
-from core.load_file import load_image
+import os
 
+
+from core.load_file import load_image
+print(os.getcwd())
 
 class Button:
     def __init__(self, x, y, image):
         self.x = x
         self.y = y
         self.image = load_image(image)
-
-        # from PIL import Image, ImageEnhance ######## make less contrast photo
-        # print(image.split('/')[1].split('.')[0])
-        # im = Image.open(f'images/{image}')
-        # enhancer = ImageEnhance.Contrast(im)
-        # factor = 0.2
-        # im_output = enhancer.enhance(factor)
-        # im_output.save(f'images/{image.split("/")[0]}/{image.split("/")[1].split(".")[0]}_pointing.png')
-
+        if not os.path.exists(
+                f'images/{image.split("/")[0]}/'
+                f'{image.split("/")[1].split(".")[0]}_pointing.png'
+        ):
+            from PIL import Image, ImageEnhance
+            im = Image.open(f'images/{image}')
+            enhancer = ImageEnhance.Contrast(im)
+            factor = 0.2
+            im_output = enhancer.enhance(factor)
+            im_output.save(f'images/{image.split("/")[0]}/{image.split("/")[1].split(".")[0]}_pointing.png')
         self.pointing_image = load_image(
             f'{image.split("/")[0]}/'
             f'{image.split("/")[1].split(".")[0]}_pointing.png'
