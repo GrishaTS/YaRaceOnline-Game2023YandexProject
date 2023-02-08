@@ -3,7 +3,7 @@
   "model": "garage",
   "pk": 1,
   "fields": {
-    "model": "Fleetwood Bounder RV 1986",
+    "model": "Fleetwood Bounder RV",
     "photo": "garage/side_view/1.png",
     "price": 0,
     "velocity": 70,
