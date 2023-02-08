@@ -6,8 +6,7 @@ import pygame
 
 from core.audio import sounds
 from core.load_file import load_image
-from settings import HEIGHT, WIDTH
-from users.models import User
+from settings import HEIGHT, WIDTH, IPv4
 
 
 class Finish(pygame.sprite.Sprite):
@@ -84,7 +83,7 @@ class Car(pygame.sprite.Sprite):
 
 
 class Game:
-    def __init__(self, screen, user, socket_server, new_user):
+    def __init__(self, screen, user, socket_server, new_user_car):
         self.screen = screen
         self.finish = []
         self.barriers = []
@@ -99,11 +98,12 @@ class Game:
         )
         self.opponent_car = Car(
             900,
-            f'garage/top_view/{new_user.selected_car}.png',
-            new_user.selected_car,
+            f'garage/top_view/{new_user_car}.png',
+            int(new_user_car),
         )
         self.bg_photo = load_image('game/road_example.jpg')
         self.bg_y = 0
+        self.y = 0
         # self.level = random.randrange(1, 10)
         self.level = 1
 
@@ -166,7 +166,7 @@ class Game:
         while True:
             opponent_coordinates = self.socket_server.recv(1024).decode('utf-8')
             print(opponent_coordinates)
-            self.socket_server.send(f'{self.car.angle} | {self.car.rect}'.encode('utf-8'))
+            self.socket_server.send(f'{self.car.angle} | {self.car.rect} | {self.y}'.encode('utf-8'))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -353,22 +353,22 @@ class Game:
 
 
 def race(user):
-    name = user.login
+    user_car = str(user.selected_car)
     try:
         socket_server = socket.socket()
-        socket_server.connect(('192.168.0.14', 8000))
-        socket_server.send(name.encode('utf-8'))
-        new_user = User(socket_server.recv(1024).decode('utf-8'))
+        socket_server.connect((IPv4, 8000))
+        socket_server.send(user_car.encode('utf-8'))
+        new_user_car = socket_server.recv(1024).decode('utf-8') # send car
     except ConnectionRefusedError:
         socket_server = socket.socket()
         socket_server.bind(('0.0.0.0', 8000))
         socket_server.listen(1)
         print('Server is running')
         socket_server, add = socket_server.accept()
-        new_user = User(socket_server.recv(1024).decode('utf-8'))
-        socket_server.send(name.encode('utf-8'))
+        new_user_car = socket_server.recv(1024).decode('utf-8')
+        socket_server.send(user_car.encode('utf-8'))
 
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    game = Game(screen, user, socket_server, new_user)
+    game = Game(screen, user, socket_server, new_user_car)
     game.start_screen()
