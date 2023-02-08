@@ -65,7 +65,7 @@ class CreateTables:
 
 def check_create_db():
     if not os.path.exists('db.sqlite3'):
-        open('db.sqlite3', 'x')
+        open(DATABASE, 'x')
         CreateTables.create_user_table()
         CreateTables.create_garage_table()
         CreateTables.create_user_garage_table()

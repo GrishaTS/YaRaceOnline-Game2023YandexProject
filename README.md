@@ -36,11 +36,17 @@ source venv/bin/activate
 ```commandline
 pip install -r requirements.txt
 ```
+### 4. Generate file with virtual environment variables (.env)
 
+4.1 Generate file '.env' in root directory with such structure
+```text
+IPv4=YOUR-IPv4-address
+DATABASE=YOUR-DATABASE-FILE
+```
 
-### 4. Running project
+### 5. Running project
 
-4.1 Run this command
+5.1 Run this command
 ```commandline
 python main.py
 ```
