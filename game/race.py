@@ -83,7 +83,7 @@ class Car(pygame.sprite.Sprite):
 
 
 class Game:
-    def __init__(self, screen, user, socket_server, new_user_car):
+    def __init__(self, screen, user, socket_server, new_user_car, is_server):
         self.screen = screen
         self.finish = []
         self.barriers = []
@@ -91,6 +91,7 @@ class Game:
         self.start_coin = user.coins
         self.user = user
         self.socket_server = socket_server
+        self.is_server = is_server
         self.car = Car(
             300,
             f'garage/top_view/{user.selected_car}.png',
@@ -164,9 +165,12 @@ class Game:
         self.map_race = open(f'game/levels/{self.level}.txt').read().split()
         self.map_i = 0
         while True:
-            opponent_coordinates = self.socket_server.recv(1024).decode('utf-8')
-            print(opponent_coordinates)
-            self.socket_server.send(f'{self.car.angle} | {self.car.rect} | {self.y}'.encode('utf-8'))
+            if self.is_server:
+                self.socket_server.send(f'{self.car.angle} | {self.car.rect} | {self.y}'.encode('utf-8'))
+                opponent_coordinates = self.socket_server.recv(1024).decode('utf-8')
+            else:
+                opponent_coordinates = self.socket_server.recv(1024).decode('utf-8')
+                self.socket_server.send(f'{self.car.angle} | {self.car.rect} | {self.y}'.encode('utf-8'))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -354,12 +358,14 @@ class Game:
 
 def race(user):
     user_car = str(user.selected_car)
+    is_server = False
     try:
         socket_server = socket.socket()
         socket_server.connect((IPv4, 8000))
         socket_server.send(user_car.encode('utf-8'))
         new_user_car = socket_server.recv(1024).decode('utf-8') # send car
     except ConnectionRefusedError:
+        is_server = True
         socket_server = socket.socket()
         socket_server.bind(('0.0.0.0', 8000))
         socket_server.listen(1)
@@ -370,5 +376,5 @@ def race(user):
 
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    game = Game(screen, user, socket_server, new_user_car)
+    game = Game(screen, user, socket_server, new_user_car, is_server)
     game.start_screen()
