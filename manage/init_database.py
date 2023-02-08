@@ -18,10 +18,10 @@ class CreateTables:
             record          TIME,
             password        VARCHAR NOT NULL,
             selected_car    INTEGER REFERENCES garage (id),
-            selected_music  INTEGER CHECK (music >= 0 AND
-                                        music < 11),
-            selected_sounds INTEGER CHECK (sounds >= 0 AND
-                                        sounds < 11)
+            selected_music  INTEGER CHECK (selected_music >= 0 AND
+                                        selected_music < 11),
+            selected_sounds INTEGER CHECK (selected_sounds >= 0 AND
+                                        selected_sounds < 11)
         )
         '''
         con.execute(request)
