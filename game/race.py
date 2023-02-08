@@ -363,7 +363,7 @@ def race(user):
         socket_server = socket.socket()
         socket_server.connect((IPv4, 8000))
         socket_server.send(user_car.encode('utf-8'))
-        new_user_car = socket_server.recv(1024).decode('utf-8') # send car
+        new_user_car = socket_server.recv(1024).decode('utf-8')
     except ConnectionRefusedError:
         is_server = True
         socket_server = socket.socket()
