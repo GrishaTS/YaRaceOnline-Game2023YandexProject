@@ -1,3 +1,4 @@
+import random
 import sys
 import time
 
@@ -61,8 +62,7 @@ class Game:
         )
         self.bg_photo = load_image('game/road_example.jpg')
         self.bg_y = 0
-        # self.level = random.randrange(1, 10)
-        self.level = 1
+        self.level = random.randrange(1, 6)
 
     def start_race(self):
         k = 3
