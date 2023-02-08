@@ -53,8 +53,8 @@ class UserModel:
         con = sqlite3.connect(DATABASE)
         request = f'''INSERT INTO user
                           ('login', 'password', selected_car, coins,
-                           selected_music, selected_sounds)
-                      VALUES ('{login}', '{password}', 1, 0, 5, 5)
+                           selected_music, selected_sounds, record)
+                      VALUES ('{login}', '{password}', 1, 0, 5, 5, 0)
                    '''
         con.execute(request)
         con.commit()

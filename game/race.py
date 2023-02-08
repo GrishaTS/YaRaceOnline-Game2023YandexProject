@@ -1,3 +1,4 @@
+import socket
 import sys
 import time
 
@@ -5,7 +6,7 @@ import pygame
 
 from core.audio import sounds
 from core.load_file import load_image
-from settings import HEIGHT, WIDTH
+from settings import HEIGHT, WIDTH, IPv4
 
 
 class Finish(pygame.sprite.Sprite):
@@ -45,13 +46,22 @@ class Barrier(pygame.sprite.Sprite):
 
 
 class Car(pygame.sprite.Sprite):
-    def __init__(self, x, file, car_id):
+    def __init__(self, x, file, car_id, opponent=False):
         super(Car, self).__init__()
         self.max_velocity = 30 - (7 - car_id) * 2
         self.velocity = 0
         self.angle = 0
-        self.base_image = load_image(file)
-        self.image = load_image(file)
+
+        if opponent:
+            self.base_image = load_image(file)
+            self.image = load_image(file)
+
+            self.base_image.set_alpha(90)
+            self.image.set_alpha(90)
+        else:
+            self.base_image = load_image(file)
+            self.image = load_image(file)
+
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(x, 420)
         self.mask = pygame.mask.from_surface(self.image)
@@ -82,20 +92,35 @@ class Car(pygame.sprite.Sprite):
 
 
 class Game:
-    def __init__(self, screen, user):
+    def __init__(self, screen, user, socket_server, new_user_car, is_server):
         self.screen = screen
         self.finish = []
         self.barriers = []
         self.coins = []
         self.start_coin = user.coins
         self.user = user
+        self.socket_server = socket_server
+        self.is_server = is_server
+        self.opp_car_y = 0
+        self.opp_end_game = False
+        car_x, opp_car_x = 300, 900
+        if is_server:
+            car_x, opp_car_x = opp_car_x, car_x
         self.car = Car(
-            700,
+            car_x,
             f'garage/top_view/{user.selected_car}.png',
             user.selected_car,
         )
+        self.opp_car_model = new_user_car
+        self.opponent_car = Car(
+            opp_car_x,
+            f'garage/top_view/{new_user_car}.png',
+            int(new_user_car),
+            opponent=True,
+        )
         self.bg_photo = load_image('game/road_example.jpg')
         self.bg_y = 0
+        self.y = 0
         # self.level = random.randrange(1, 10)
         self.level = 1
 
@@ -115,23 +140,24 @@ class Game:
     def draw_start(self, k):
         self.screen.fill('black')
         self.screen.blit(self.bg_photo, (0, self.bg_y))
-        btn_img = pygame.transform.scale(
-            self.car.image,
-            self.car.image.get_size(),
-        )
-        self.screen.blit(
-            btn_img,
-            (
-                (
-                    self.car.rect.x -
-                    (
-                        self.car.image.get_width()
-                        - self.car.base_image.get_width()
-                    ) // 2
-                ),
-                420,
+        for car in [self.opponent_car, self.car]:
+            btn_img = pygame.transform.scale(
+                car.image,
+                car.image.get_size(),
             )
-        )
+            self.screen.blit(
+                btn_img,
+                (
+                    (
+                        car.rect.x -
+                        (
+                            car.image.get_width()
+                            - car.base_image.get_width()
+                        ) // 2
+                    ),
+                    420,
+                )
+            )
         font_s = pygame.font.Font(None, 400)
         text_price = font_s.render(
             f'{k}',
@@ -155,10 +181,47 @@ class Game:
         self.map_race = open(f'game/levels/{self.level}.txt').read().split()
         self.map_i = 0
         while True:
+            if not self.opp_end_game:
+                if self.is_server:
+                    self.socket_server.send(
+                        (
+                            f'{self.car.angle} | {self.car.rect} | {self.y}'
+                            .encode('utf-8')
+                        )
+                    )
+                    opp_coord = self.socket_server.recv(1024).decode('utf-8')
+                else:
+                    opp_coord = self.socket_server.recv(1024).decode('utf-8')
+                    self.socket_server.send(
+                        (
+                            f'{self.car.angle} | {self.car.rect} | {self.y}'
+                            .encode('utf-8')
+                        )
+                    )
+                if '|' not in opp_coord:
+                    self.opp_end_game = True
+                    opp_coord = f'{self.angle} | {self.rect} | {self.y_pos}'
+            else:
+                opp_coord = f'{self.angle} | {self.rect} | {self.y_pos}'
+
+            self.angle, self.rect, self.y_pos = opp_coord.split(' | ')
+            rect = eval(self.rect[5:-1])
+            del self.opponent_car
+            self.opponent_car = Car(
+                rect[0],
+                f'garage/top_view/{self.opp_car_model}.png',
+                int(self.opp_car_model),
+                opponent=True,
+            )
+            self.opponent_car.angle = int(self.angle)
+            self.opp_car_y = int(self.y_pos)
+            self.opponent_car.move_angle()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+
                 elif event.type == pygame.KEYDOWN:
                     flag = False
                     key = event.__dict__.get('unicode')
@@ -178,6 +241,7 @@ class Game:
                         key != '' and key in 'фцвыawdsAWDSФЦВЫ'
                     ):
                         self.car.move(key)
+
                 elif event.type == pygame.KEYUP:
                     flag = True
             if flag:
@@ -192,6 +256,7 @@ class Game:
                 self.car.move_angle()
             self.check_crash()
             self.bg_y += self.car.velocity
+            self.y += self.car.velocity
             if self.bg_y >= 720:
                 self.map_i += 1
                 self.bg_y = 0
@@ -231,23 +296,25 @@ class Game:
                 )
             for i in to_del:
                 items.remove(i)
-        btn_img = pygame.transform.scale(
-            self.car.image,
-            self.car.image.get_size(),
-        )
-        self.screen.blit(
-            btn_img,
-            (
-                (
-                    self.car.rect.x -
-                    (
-                        self.car.image.get_width()
-                        - self.car.base_image.get_width()
-                    ) // 2
-                ),
-                420,
+        for car in [self.opponent_car, self.car]:
+            btn_img = pygame.transform.scale(
+                car.image,
+                car.image.get_size(),
             )
-        )
+            opp_screen_y = 420 + self.y - self.opp_car_y
+            self.screen.blit(
+                btn_img,
+                (
+                    (
+                        car.rect.x -
+                        (
+                            car.image.get_width()
+                            - car.base_image.get_width()
+                        ) // 2
+                    ),
+                    420 if car is self.car else opp_screen_y,
+                )
+            )
         font_s = pygame.font.Font(None, 40)
         text_c = font_s.render(f'{self.user.coins}$', True, '#54bd42')
         text_w_c = text_c.get_width()
@@ -268,6 +335,25 @@ class Game:
         self.screen.blit(text_c, (x_c, y_c))
         pygame.display.flip()
 
+    def end_game_notice(self):
+        if not self.opp_end_game:
+            if self.is_server:
+                self.socket_server.send(
+                    (
+                        'end_game'
+                        .encode('utf-8')
+                    )
+                )
+                self.socket_server.recv(1024).decode('utf-8')
+            else:
+                self.socket_server.recv(1024).decode('utf-8')
+                self.socket_server.send(
+                    (
+                        'end_game'
+                        .encode('utf-8')
+                    )
+                )
+
     def check_crash(self):
         clock = pygame.time.Clock()
         flag = False
@@ -280,11 +366,11 @@ class Game:
                 del self.coins[self.coins.index(coin)]
                 sounds['get coin'].play()
                 self.user['coins'] = self.user.coins + 100
-        if self.finish:
-            if self.finish[0].rect.y > 650:
-                from homepage.screensaver import homepage
-                self.end_race((time.time() - self.start_race_time) // 1)
-                homepage(self.user, music=False)
+        if self.finish and self.finish[0].rect.y > 650:
+            from homepage.screensaver import homepage
+            self.end_game_notice()
+            self.end_race((time.time() - self.start_race_time) // 1)
+            homepage(self.user, music=False)
         if (
             (
                 self.car.rect.x -
@@ -333,13 +419,51 @@ class Game:
         x_c = (WIDTH - text_c.get_width()) / 2
         y_c = 100
         self.screen.blit(text_c, (x_c, y_c))
-        sounds['win'].play()
+        if self.opp_end_game:
+            font_s = pygame.font.Font(None, 100)
+            text_c = font_s.render(
+                'Поражение',
+                True,
+                'red',
+            )
+            x_c = (WIDTH - text_c.get_width()) / 2
+            y_c = 200
+            self.screen.blit(text_c, (x_c, y_c))
+            sounds['loss'].play()
+        else:
+            font_s = pygame.font.Font(None, 100)
+            text_c = font_s.render(
+                'Победа',
+                True,
+                'red',
+            )
+            x_c = (WIDTH - text_c.get_width()) / 2
+            y_c = 200
+            self.screen.blit(text_c, (x_c, y_c))
+            sounds['win'].play()
         pygame.display.flip()
         time.sleep(3)
 
 
 def race(user):
+    user_car = str(user.selected_car)
+    is_server = False
+    try:
+        socket_server = socket.socket()
+        socket_server.connect((IPv4, 8000))
+        socket_server.send(user_car.encode('utf-8'))
+        new_user_car = socket_server.recv(1024).decode('utf-8')
+    except ConnectionRefusedError:
+        is_server = True
+        socket_server = socket.socket()
+        socket_server.bind(('0.0.0.0', 8000))
+        socket_server.listen(1)
+        print('Server is running')
+        socket_server, add = socket_server.accept()
+        new_user_car = socket_server.recv(1024).decode('utf-8')
+        socket_server.send(user_car.encode('utf-8'))
+
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    game = Game(screen, user)
+    game = Game(screen, user, socket_server, new_user_car, is_server)
     game.start_screen()

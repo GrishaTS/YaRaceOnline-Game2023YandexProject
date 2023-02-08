@@ -2,3 +2,7 @@ SIZE = WIDTH, HEIGHT = 1280, 720
 
 
 DATABASE = 'db.sqlite3'
+
+IPv4 = '192.168.1.7'
+# 192.168.0.14
+# 192.168.1.7

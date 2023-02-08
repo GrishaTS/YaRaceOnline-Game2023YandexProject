@@ -1,4 +1,4 @@
-# YaRaceOnline-Game2023YandexProject
+# YaRaceOnline
 
 ![flake8 test](https://github.com/GrishaTS/YaRaceOnline-Game2023YandexProject/actions/workflows/python-package.yml/badge.svg)
 
