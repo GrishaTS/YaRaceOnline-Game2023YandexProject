@@ -1,0 +1,75 @@
+import os
+import sqlite3
+
+from settings import DATABASE
+
+
+class CreateTables:
+    @staticmethod
+    def create_user_table():
+        con = sqlite3.connect(DATABASE)
+        request = '''CREATE TABLE user (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT
+                                    UNIQUE
+                                    NOT NULL,
+            login           VARCHAR UNIQUE
+                                    NOT NULL,
+            coins           INTEGER,
+            music           INTEGER CHECK (music >= 0 AND
+                                        music < 11),
+            sounds          INTEGER CHECK (sounds >= 0 AND
+                                        sounds < 11),
+            record          TIME,
+            password        VARCHAR NOT NULL,
+            selected_car    INTEGER REFERENCES garage (id),
+            selected_music  INTEGER CHECK (music >= 0 AND
+                                        music < 11),
+            selected_sounds INTEGER CHECK (sounds >= 0 AND
+                                        sounds < 11)
+        )
+        '''
+        con.execute(request)
+        con.commit()
+
+    @staticmethod
+    def create_garage_table():
+        con = sqlite3.connect(DATABASE)
+        request = '''CREATE TABLE garage (
+            id       INTEGER PRIMARY KEY AUTOINCREMENT
+                            UNIQUE
+                            NOT NULL,
+            model    VARCHAR UNIQUE
+                            NOT NULL,
+            photo            NOT NULL,
+            price    INTEGER,
+            velocity INTEGER,
+            x        INTEGER,
+            y        INTEGER
+        )
+        '''
+        con.execute(request)
+        con.commit()
+
+    @staticmethod
+    def create_user_garage_table():
+        con = sqlite3.connect(DATABASE)
+        request = '''CREATE TABLE user_garage (
+            id        INTEGER PRIMARY KEY AUTOINCREMENT
+                            UNIQUE
+                            NOT NULL,
+            user_id   BIGINT  REFERENCES user (id) ON DELETE CASCADE
+                            NOT NULL,
+            garage_id BIGINT  REFERENCES garage (id) ON DELETE CASCADE
+                            NOT NULL
+        )
+        '''
+        con.execute(request)
+        con.commit()
+
+
+def check_create_db():
+    if not os.path.exists('db.sqlite3'):
+        open('db.sqlite3', 'x')
+        CreateTables.create_user_table()
+        CreateTables.create_garage_table()
+        CreateTables.create_user_garage_table()

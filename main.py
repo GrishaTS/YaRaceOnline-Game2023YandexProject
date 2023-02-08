@@ -4,6 +4,7 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 from manage.loaddata import loaddata
+from manage.init_database import check_create_db
 from users.sign_in.sign_in_widget import SignInWidget
 
 
@@ -22,6 +23,7 @@ if args.loaddata is not None:
     loaddata(args.loaddata)
 
 if __name__ == '__main__' and args.loaddata is None:
+    check_create_db()
     app = QApplication(sys.argv)
     ex = SignInWidget()
     ex.show()
