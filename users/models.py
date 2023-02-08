@@ -30,6 +30,18 @@ class UserModel:
         return data
 
     @staticmethod
+    def select_user_id(*, login):
+        con = sqlite3.connect(DATABASE)
+        request = f'''SELECT
+                          id
+                      FROM user
+                      WHERE login = '{login}'
+                  '''
+        data = con.execute(request).fetchall()
+        con.commit()
+        return data
+
+    @staticmethod
     def update_user(*, login, key, value):
         con = sqlite3.connect(DATABASE)
         request = f'''UPDATE user
@@ -55,6 +67,18 @@ class UserModel:
                           ('login', 'password', selected_car, coins,
                            selected_music, selected_sounds, record)
                       VALUES ('{login}', '{password}', 1, 0, 5, 5, 0)
+                   '''
+        con.execute(request)
+        con.commit()
+        UserModel.insert_user_garage(login=login)
+
+    @staticmethod
+    def insert_user_garage(*, login):
+        con = sqlite3.connect(DATABASE)
+        user_id = UserModel.select_user_id(login=login)[0][0]
+        request = f'''INSERT INTO user_garage
+                         (user_id, garage_id)
+                      VALUES ({user_id}, 1)
                    '''
         con.execute(request)
         con.commit()
