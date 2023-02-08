@@ -1,30 +1,27 @@
 user
 --
-ID int pk
-name varchar
-money int
-music int
-sounds int
-active_car bigint fk
-active_road bigint fk
+ID integer pk
+login varchar
+coins integer
 record time
+password varchar
+selected_car integer
+selected_music integer
+selected_sounds integer
 
 garage
 --
-ID int pk
+ID integer pk
 model varchar
 photo varchar
-price int
-speed int
+price integer
+velocity integer
+x integer
+y integer
 
 
 user_garage
 --
-ID int pk
+ID integer pk
 user_id bigint FK >- user.ID
 garage_id bigint FK >- garage.ID
-
-road
---
-ID int pk
-photos varchar

@@ -37,7 +37,7 @@ class CreateTables:
                             NOT NULL,
             model    VARCHAR UNIQUE
                             NOT NULL,
-            photo            NOT NULL,
+            photo    VARCHAR NOT NULL,
             price    INTEGER,
             velocity INTEGER,
             x        INTEGER,
