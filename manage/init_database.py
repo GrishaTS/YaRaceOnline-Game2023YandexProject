@@ -1,6 +1,7 @@
 import os
 import sqlite3
 
+from manage.loaddata import loaddata
 from settings import DATABASE
 
 
@@ -69,3 +70,4 @@ def check_create_db():
         CreateTables.create_user_table()
         CreateTables.create_garage_table()
         CreateTables.create_user_garage_table()
+        loaddata('fixtures/garage.json')
