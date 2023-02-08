@@ -15,10 +15,6 @@ class CreateTables:
             login           VARCHAR UNIQUE
                                     NOT NULL,
             coins           INTEGER,
-            music           INTEGER CHECK (music >= 0 AND
-                                        music < 11),
-            sounds          INTEGER CHECK (sounds >= 0 AND
-                                        sounds < 11),
             record          TIME,
             password        VARCHAR NOT NULL,
             selected_car    INTEGER REFERENCES garage (id),
