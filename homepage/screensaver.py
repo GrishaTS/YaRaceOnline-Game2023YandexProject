@@ -1,8 +1,10 @@
 import pygame
 
+from core.audio import sounds
 from core.buttons import Button
 from core.load_file import load_image
 from core.screen_operation import terminate
+from game.race import race
 from homepage.change_car import choosing_car
 from homepage.change_options import settings
 from settings import HEIGHT, WIDTH
@@ -16,7 +18,7 @@ class Manager:
     btn_func = {
         'button_settings': settings,
         'button_garage': choosing_car,
-        # 'button_road': lambda x: x,
+        'button_road': race,
     }
 
     def __init__(self, screen, user, music):
@@ -26,6 +28,9 @@ class Manager:
         self.button_settings = Button(1200, 20, 'screensaver/settings.png')
         self.button_garage = Button(20, 80, 'screensaver/garage.png')
         self.button_road = Button(20, 20, 'screensaver/road.png')
+        for i in sounds:
+            sounds[i].set_volume(user.selected_sounds / 10)
+        pygame.mixer.music.set_volume(user.selected_music / 10)
 
     def start_screen(self):
         if self.music:

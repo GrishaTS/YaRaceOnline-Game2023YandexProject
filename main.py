@@ -22,6 +22,7 @@ args = parser.parse_args()
 if args.loaddata is not None:
     loaddata(args.loaddata)
 
+
 if __name__ == '__main__' and args.loaddata is None:
     check_create_db()
     app = QApplication(sys.argv)
