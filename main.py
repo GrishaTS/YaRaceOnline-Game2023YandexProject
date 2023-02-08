@@ -3,8 +3,8 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from manage.loaddata import loaddata
 from manage.init_database import check_create_db
+from manage.loaddata import loaddata
 from users.sign_in.sign_in_widget import SignInWidget
 
 

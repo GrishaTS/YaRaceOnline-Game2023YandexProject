@@ -1,8 +1,7 @@
 import os
 
-
 from core.load_file import load_image
-print(os.getcwd())
+
 
 class Button:
     def __init__(self, x, y, image):
@@ -18,7 +17,10 @@ class Button:
             enhancer = ImageEnhance.Contrast(im)
             factor = 0.2
             im_output = enhancer.enhance(factor)
-            im_output.save(f'images/{image.split("/")[0]}/{image.split("/")[1].split(".")[0]}_pointing.png')
+            im_output.save(
+                f'images/{image.split("/")[0]}'
+                f'/{image.split("/")[1].split(".")[0]}_pointing.png'
+                )
         self.pointing_image = load_image(
             f'{image.split("/")[0]}/'
             f'{image.split("/")[1].split(".")[0]}_pointing.png'
