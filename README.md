@@ -21,7 +21,7 @@ This project is the second credit project at the Lyceum Academy Yandex. This is 
 
 ![Image of the race between two users](https://github.com/GrishaTS/YaRaceOnline-Game2023YandexProject/raw/main/media_for_README/two-cars.png)
 ![Image of the victory](https://github.com/GrishaTS/YaRaceOnline-Game2023YandexProject/raw/main/media_for_README/victory.png)
-![Image of the garage](https://github.com/GrishaTS/YaRaceOnline-Game2023YandexProject/raw/main/media_for_README/garage.png)
+![Image of the garage](https://github.com/GrishaTS/YaRaceOnline-Game2023YandexProject/raw/main/media_for_README/garage.jpg)
 ***
 
 ## Deployment instructions
