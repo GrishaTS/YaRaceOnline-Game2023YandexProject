@@ -147,6 +147,8 @@ class Game:
         self.start_race_time = time.time()
         self.map_race = open(f'game/levels/{self.level}.txt').read().split()
         self.map_i = 0
+        sounds['overclocking'].play(1)
+        sounds['default_car'].play(100)
         while True:
             if not self.opp_end_game:
                 if self.is_server:
@@ -355,6 +357,7 @@ class Game:
             ) or
             flag
         ):
+            sounds['default_car'].stop()
             sounds['crash'].play()
             if not flag:
                 self.car.rect.x = 600
@@ -366,8 +369,12 @@ class Game:
                     self.car.image.set_alpha(100)
                 self.draw()
                 clock.tick(50)
+            sounds['overclocking'].play(1)
+            sounds['default_car'].play(100)
 
     def end_race(self, race_time):
+        sounds['overclocking'].stop()
+        sounds['default_car'].stop()
         if self.user.record > race_time:
             self.user.record = race_time
             font_s = pygame.font.Font(None, 100)
